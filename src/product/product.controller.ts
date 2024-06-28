@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, HttpStatus, HttpException, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -8,6 +8,7 @@ import { FileService } from 'src/file/file.service';
 import { Observable, of, switchMap } from 'rxjs';
 import { ProductInt } from './interfaces/product.interface';
 import { DeleteResult } from 'typeorm';
+import { AllProductDto, AllProductRes } from './dto/all-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -32,8 +33,8 @@ export class ProductController {
   }
 
   @Get()
-  findAll(): Observable<ProductInt[]> {
-    return this.productService.findAll();
+  findAll(@Query() query: AllProductDto): Observable<AllProductRes> {
+    return this.productService.findAll(query);
   }
 
   @Get(':id')

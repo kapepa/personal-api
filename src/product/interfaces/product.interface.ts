@@ -4,6 +4,6 @@ export interface ProductInt {
   image: string,
   price: string,
   rating: number,
-  created_at: Date,
-  updated_at: Date,
+  created_at?: Date,
+  updated_at?: Date,
 }
