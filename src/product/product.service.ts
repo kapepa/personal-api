@@ -7,6 +7,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { Observable, from, of, switchMap, tap } from 'rxjs';
 import { ProductInt } from './interfaces/product.interface';
 import { FileService } from 'src/file/file.service';
+import { AllProductDto, AllProductRes } from './dto/all-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -20,8 +21,20 @@ export class ProductService {
     return from(this.productRepository.save(productBody));
   }
 
-  findAll(): Observable<ProductInt[]> {
-    return from(this.productRepository.find());
+  findAll({ page, perPage }: AllProductDto): Observable<AllProductRes> {
+
+    return from(this.productRepository.find()).pipe(
+      switchMap((products: ProductInt[]) => {
+
+        return of({
+            items: products,
+            total: products.length,
+            page: 0,
+            perPage: 1,
+            totalPages: 10,
+          })
+      })
+    )
   }
 
   findOne(id: string): Observable<ProductInt> {
