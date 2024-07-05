@@ -6,7 +6,8 @@ import * as crypto from 'crypto';
 @Injectable()
 export class SharpPipe implements PipeTransform<Express.Multer.File, Promise<string>> {
 
-  async transform(image: Express.Multer.File): Promise<string> {
+  async transform(image: Express.Multer.File): Promise<string | undefined> {
+    if ( image === undefined ) return undefined;
     const randomBytes = crypto.randomBytes(16);
     const randomHex = randomBytes.toString('hex');
     const filename = randomHex + '.webp';

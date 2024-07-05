@@ -18,11 +18,16 @@ export class ProductService {
   ) {}
 
   create(productBody: CreateProductDto): Observable<ProductInt> {
-    return from(this.productRepository.save(productBody));
+    const product = this.productRepository.create(productBody);
+
+    return from(this.productRepository.save(product)).pipe(
+      switchMap(() => {
+        return of(product)
+      })
+    );
   }
 
   findAll({ page, perPage }: AllProductDto): Observable<AllProductRes> {
-
     return from(this.productRepository.find()).pipe(
       switchMap((products: ProductInt[]) => {
 
@@ -45,7 +50,7 @@ export class ProductService {
     }));
   }
 
-  async update(id: string, body: UpdateProductDto) {
+  async update(id: string, body: UpdateProductDto): Promise<Observable<ProductInt>> {
     const existProduct = await this.productRepository.findOne({
       where: { id }
     })
@@ -56,6 +61,11 @@ export class ProductService {
       { id: existProduct.id },
       body
     )).pipe(
+      switchMap(() => {
+        return this.productRepository.findOne({
+          where: { id }
+        })
+      }),
       tap(() => {
         if (!!body.image && body.image !== existProduct.image) this.fileService.remove(existProduct.image);
       })
@@ -76,4 +86,4 @@ export class ProductService {
       })
     )
   }
-}
+};
