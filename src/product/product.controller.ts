@@ -44,9 +44,21 @@ export class ProductController {
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('image'))
-  update(@Param('id') id: string, @UploadedFile(SharpPipe) image: string, @Body() body: UpdateProductDto) {
-    const toBody = JSON.parse(JSON.stringify(body));
-    return this.productService.update(id, Object.assign(toBody, {image}));
+  update(@Param('id') id: string, @UploadedFile(SharpPipe) image: string, @Body() body?: UpdateProductDto): Promise<Observable<ProductInt | BadRequestException>> {
+    try {
+      const toBody = JSON.parse(JSON.stringify(body));
+
+      return this.productService.update(
+        id, 
+        !!image ? Object.assign(toBody, {image}) : toBody
+      );
+    } catch (err) {
+      this.fileService.remove(image).pipe(
+        switchMap(() => {
+          throw err
+        })
+      )
+    }
   }
 
   @Delete(':id')
